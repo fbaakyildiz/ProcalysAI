@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List
 from enum import Enum
 
@@ -44,6 +44,33 @@ class PatientInput(BaseModel):
     previous_pct: Optional[List[PCTMeasurement]] = None
     clinical_notes: Optional[str] = None
 
+    @field_validator('clinical_notes')
+    @classmethod
+    def sanitize_clinical_notes(cls, v):
+        if v is None:
+            return v
+        import re
+        banned_patterns = [
+            r'ignore\s+(all\s+)?previous\s+instructions',
+            r'you\s+are\s+now\s+a',
+            r'new\s+instruction[s]?',
+            r'system\s+prompt',
+            r'disregard\s+(all\s+)?',
+            r'\[INST\]',
+            r'###\s*instruction',
+            r'</?(system|prompt|instruction)\s*>',
+            r'override\s+(all\s+)?',
+        ]
+        for pattern in banned_patterns:
+            if re.search(pattern, v, re.IGNORECASE):
+                raise ValueError(
+                    "Clinical notes contain invalid content. "
+                    "Please enter only clinical observations."
+                )
+        if len(v) > 2000:
+            raise ValueError("Clinical notes must be under 2000 characters.")
+        return v
+
 
 class AgentOutput(BaseModel):
     agent_name: str
@@ -70,3 +97,7 @@ class StewardshipReport(BaseModel):
         "Clinical decisions remain the sole responsibility of the treating clinician."
     )
     agents: List[AgentOutput] = []
+    pipeline_metadata: Optional[List[dict]] = []
+    total_tokens_est: Optional[int] = None
+    total_cost_usd_est: Optional[float] = None
+    total_latency_seconds: Optional[float] = None
