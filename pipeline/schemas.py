@@ -3,6 +3,32 @@ from typing import Optional, List
 from enum import Enum
 
 
+def _sanitize_prompt_injection_text(v: Optional[str], field_label: str) -> Optional[str]:
+    if v is None:
+        return v
+    import re
+    banned_patterns = [
+        r'ignore\s+(all\s+)?previous\s+instructions',
+        r'you\s+are\s+now\s+a',
+        r'new\s+instruction[s]?',
+        r'system\s+prompt',
+        r'disregard\s+(all\s+)?',
+        r'\[INST\]',
+        r'###\s*instruction',
+        r'</?(system|prompt|instruction)\s*>',
+        r'override\s+(all\s+)?(previous\s+)?(instructions?|settings?|rules?|prompt|system)',
+    ]
+    for pattern in banned_patterns:
+        if re.search(pattern, v, re.IGNORECASE):
+            raise ValueError(
+                f"{field_label} contains invalid content. "
+                "Please enter only clinical observations."
+            )
+    if len(v) > 2000:
+        raise ValueError(f"{field_label} must be under 2000 characters.")
+    return v
+
+
 class ClinicalSetting(str, Enum):
     LRTI   = "lrti"
     SEPSIS = "sepsis"
@@ -11,13 +37,18 @@ class ClinicalSetting(str, Enum):
 
 
 class PCTMeasurement(BaseModel):
-    value: float
-    day: int
+    value: float = Field(ge=0)
+    day: int = Field(ge=0)
     date: Optional[str] = None
+
+    @field_validator('date')
+    @classmethod
+    def sanitize_date(cls, v):
+        return _sanitize_prompt_injection_text(v, "PCT measurement date")
 
 
 class PatientInput(BaseModel):
-    pct_value: float
+    pct_value: float = Field(ge=0)
     clinical_setting: ClinicalSetting
     temperature: Optional[float] = None
     respiratory_rate: Optional[int] = None
@@ -47,36 +78,14 @@ class PatientInput(BaseModel):
     @field_validator('clinical_notes')
     @classmethod
     def sanitize_clinical_notes(cls, v):
-        if v is None:
-            return v
-        import re
-        banned_patterns = [
-            r'ignore\s+(all\s+)?previous\s+instructions',
-            r'you\s+are\s+now\s+a',
-            r'new\s+instruction[s]?',
-            r'system\s+prompt',
-            r'disregard\s+(all\s+)?',
-            r'\[INST\]',
-            r'###\s*instruction',
-            r'</?(system|prompt|instruction)\s*>',
-            r'override\s+(all\s+)?(previous\s+)?(instructions?|settings?|rules?|prompt|system)',
-        ]
-        for pattern in banned_patterns:
-            if re.search(pattern, v, re.IGNORECASE):
-                raise ValueError(
-                    "Clinical notes contain invalid content. "
-                    "Please enter only clinical observations."
-                )
-        if len(v) > 2000:
-            raise ValueError("Clinical notes must be under 2000 characters.")
-        return v
+        return _sanitize_prompt_injection_text(v, "Clinical notes")
 
 
 class AgentOutput(BaseModel):
     agent_name: str
     reasoning: str
     output: dict
-    warnings: List[str] = []
+    warnings: List[str] = Field(default_factory=list)
     needs_clinician: bool = False
 
 
@@ -87,17 +96,17 @@ class StewardshipReport(BaseModel):
     recommendation_strength: str
     rationale: str
     kinetic_analysis: Optional[str] = None
-    warnings: List[str] = []
-    override_flags: List[str] = []
-    next_steps: List[str] = []
+    warnings: List[str] = Field(default_factory=list)
+    override_flags: List[str] = Field(default_factory=list)
+    next_steps: List[str] = Field(default_factory=list)
     gray_zone: bool = False
     clinician_review_required: bool = False
     disclaimer: str = (
         "This system is for research purposes only. "
         "Clinical decisions remain the sole responsibility of the treating clinician."
     )
-    agents: List[AgentOutput] = []
-    pipeline_metadata: Optional[List[dict]] = []
+    agents: List[AgentOutput] = Field(default_factory=list)
+    pipeline_metadata: Optional[List[dict]] = Field(default_factory=list)
     total_tokens_est: Optional[int] = None
     total_cost_usd_est: Optional[float] = None
     total_latency_seconds: Optional[float] = None

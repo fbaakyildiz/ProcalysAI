@@ -222,6 +222,7 @@ async def call_model(system_prompt: str, user_prompt: str,
     # Output validation — check for injection in LLM output
     if "injection_detected" in str(parsed.get("error", "")):
         logger.warning(f"{agent_name}: Injection detected by LLM")
+        raise ValueError(f"Agent {agent_name} detected potential prompt injection in input data")
 
     # Validate recommendation field if A4
     if agent_name == "A4_Report":
@@ -253,6 +254,16 @@ async def call_model(system_prompt: str, user_prompt: str,
     }
 
     return raw, metadata
+
+
+def _dedupe(items: list) -> list:
+    result = []
+    seen = set()
+    for item in items:
+        if item and item not in seen:
+            seen.add(item)
+            result.append(item)
+    return result
 
 
 async def validate_api_key(api_key: str) -> dict:
@@ -364,18 +375,33 @@ async def run_pipeline(patient: PatientInput, api_key: str | None = None) -> Ste
         needs_clinician=a4_data.get("needs_clinician", False),
     )
 
-    # Consolidate warnings (deduplicated)
-    all_warnings = []
-    seen = set()
-    for w in (
+    # Consolidate warnings and override flags deterministically.
+    all_warnings = _dedupe(
         a1_data.get("warnings", [])
         + a2_data.get("warnings", [])
         + a3_data.get("warnings", [])
         + a4_data.get("warnings", [])
-    ):
-        if w and w not in seen:
-            seen.add(w)
-            all_warnings.append(w)
+    )
+    all_override_flags = _dedupe(
+        a2_data.get("override_flags", [])
+        + a4_data.get("override_flags", [])
+    )
+    upstream_needs_clinician = any([
+        a1_data.get("needs_clinician", False),
+        a2_data.get("needs_clinician", False),
+        a3_data.get("needs_clinician", False),
+        a4_data.get("needs_clinician", False),
+    ])
+    gray_zone = any([
+        a2_data.get("gray_zone", False),
+        a4_data.get("gray_zone", False),
+    ])
+    day4_alert = a3_data.get("day4_alert", False)
+    if day4_alert:
+        all_warnings = _dedupe(
+            all_warnings
+            + ["Day 4 alert: PCT decline below 80% threshold; clinician review required."]
+        )
 
     report = StewardshipReport(
         patient_summary=a4_data.get("patient_summary", ""),
@@ -386,9 +412,15 @@ async def run_pipeline(patient: PatientInput, api_key: str | None = None) -> Ste
         kinetic_analysis=a4_data.get("kinetic_analysis"),
         next_steps=a4_data.get("next_steps", []),
         warnings=all_warnings,
-        override_flags=a4_data.get("override_flags", []),
-        gray_zone=a4_data.get("gray_zone", False),
-        clinician_review_required=a4_data.get("clinician_review_required", False),
+        override_flags=all_override_flags,
+        gray_zone=gray_zone,
+        clinician_review_required=bool(
+            a4_data.get("clinician_review_required", False)
+            or upstream_needs_clinician
+            or gray_zone
+            or all_override_flags
+            or day4_alert
+        ),
         agents=[a1_out, a2_out, a3_out, a4_out],
         pipeline_metadata=all_metadata,
         total_tokens_est=sum(m["total_tokens_est"] for m in all_metadata),
