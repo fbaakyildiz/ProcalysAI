@@ -20,7 +20,7 @@ Clinical decision support prototype for **PCT-guided antibiotic stewardship** us
 
 ## Developer Documentation
 
-The full developer-level design document is here:
+The design document:
 
 [docs/DESIGN.md](docs/DESIGN.md)
 
