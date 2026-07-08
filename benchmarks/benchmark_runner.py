@@ -3,6 +3,7 @@ import sys
 import time
 from collections import defaultdict
 from datetime import datetime
+from pathlib import Path
 
 import requests
 
@@ -11,6 +12,7 @@ from benchmark_cases import BENCHMARK_CASES, GROUND_TRUTH
 API_URL    = "http://localhost:8000/api/analyze"
 HEALTH_URL = "http://localhost:8000/health"
 WAIT_BETWEEN = 12  # seconds between cases (rate limiter)
+RESULTS_PATH = Path(__file__).with_name("benchmark_results.json")
 
 
 def check_server():
@@ -43,7 +45,7 @@ def main():
         print("\nERROR: Server not running at http://localhost:8000")
         print("Start with:")
         print("  export GEMINI_API_KEY=...")
-        print("  uvicorn main:app --host 0.0.0.0 --port 8000")
+        print("  uvicorn main:app --host 127.0.0.1 --port 8000")
         sys.exit(1)
 
     print(f"\nServer healthy. Running {len(BENCHMARK_CASES)} benchmark cases...")
@@ -122,9 +124,9 @@ def main():
         "total_cases":   len(BENCHMARK_CASES),
         "results":       results,
     }
-    with open("benchmark_results.json", "w") as f:
+    with RESULTS_PATH.open("w") as f:
         json.dump(output, f, indent=2)
-    print(f"\nResults saved → benchmark_results.json")
+    print(f"\nResults saved -> {RESULTS_PATH}")
 
     # ── Summary ────────────────────────────────────────────────────────────
     print("\n" + "=" * 70)

@@ -107,11 +107,13 @@ Never commit real API keys, `.env` files, shell history with credentials, or cre
 │   └── schemas.py
 ├── static/
 │   └── index.html
+├── benchmarks/
+│   ├── benchmark_cases.py
+│   ├── benchmark_runner.py
+│   └── openrouter_test.py
 ├── docs/
 │   ├── DESIGN.md
 │   └── assets/brand/
-├── benchmark_cases.py
-├── benchmark_runner.py
 ├── requirements.txt
 └── README.md
 ```

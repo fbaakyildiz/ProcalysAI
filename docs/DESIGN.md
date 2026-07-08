@@ -31,6 +31,7 @@ Core capabilities:
 ├── README.md                  # GitHub landing page
 ├── docs/
 │   ├── DESIGN.md              # Developer design document
+│   ├── archive/               # Archived document exports
 │   └── assets/brand/          # GitHub-facing brand assets
 ├── static/
 │   ├── index.html             # Single-file BrahmsAI frontend
@@ -41,9 +42,10 @@ Core capabilities:
 │   ├── prompts.py             # Agent system/user prompts
 │   ├── rate_limiter.py        # Async request spacing
 │   └── schemas.py             # Pydantic request/response models
-├── benchmark_cases.py         # Benchmark case definitions
-├── benchmark_runner.py        # End-to-end benchmark runner
-└── openrouter_test.py         # Small OpenRouter benchmark harness
+└── benchmarks/
+    ├── benchmark_cases.py     # Benchmark case definitions
+    ├── benchmark_runner.py    # End-to-end benchmark runner
+    └── openrouter_test.py     # Small OpenRouter benchmark harness
 ```
 
 ## 3. Runtime Architecture
@@ -628,10 +630,10 @@ Expected:
 
 ### Benchmark runner
 
-`benchmark_runner.py` posts benchmark cases to the live FastAPI server and writes aggregate output to:
+`benchmarks/benchmark_runner.py` posts benchmark cases to the live FastAPI server and writes aggregate output to:
 
 ```text
-benchmark_results.json
+benchmarks/benchmark_results.json
 ```
 
 The benchmark records:
