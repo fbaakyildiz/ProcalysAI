@@ -6,6 +6,8 @@
 
 Clinical decision support prototype for **PCT-guided antibiotic stewardship** using structured patient inputs, serial procalcitonin kinetics, and a four-agent LLM reasoning pipeline.
 
+[GitHub Pages project page](https://fbaakyildiz.github.io/BrahmsAI/)
+
 > **Research only:** BrahmsAI is not a medical device and does not replace clinician judgment.
 
 Project supervision: Claudia Steffen, Sr. Manager for Global Partner and Digital Development, PCT & Licensed Markers at Thermo Fisher Scientific. Contact: claudia.steffen@thermofisher.com.
