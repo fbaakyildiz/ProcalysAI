@@ -6,7 +6,7 @@
 
 Clinical decision support prototype for **PCT-guided antibiotic stewardship** using structured patient inputs, serial procalcitonin kinetics, and a four-agent LLM reasoning pipeline.
 
-[GitHub Pages project page](https://fbaakyildiz.github.io/BrahmsAI/)
+[GitHub Pages project page](https://fbaakyildiz.github.io/ProcalysAI/)
 
 > **Research only:** ProcalysAI is not a medical device and does not replace clinician judgment.
 

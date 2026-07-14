@@ -11,7 +11,7 @@ Clinical decision-support prototype for PCT-guided antibiotic stewardship using 
 | Resource | Link |
 |---|---|
 | Demo video | [Watch demo](https://www.youtube.com/watch?v=7yghCQTVTS8) |
-| GitHub repository | [fbaakyildiz/ProcalysAI](https://github.com/fbaakyildiz/BrahmsAI) |
+| GitHub repository | [fbaakyildiz/ProcalysAI](https://github.com/fbaakyildiz/ProcalysAI) |
 | Design document | [Open design document](docs/DESIGN.md) |
 | Frontend source | [Open UI file](static/index.html) |
 | Benchmark suite | [Open benchmarks](benchmarks/) |
