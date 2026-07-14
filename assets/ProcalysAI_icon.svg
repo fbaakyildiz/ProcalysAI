@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="ProcalysAI icon">
+  <defs>
+    <linearGradient id="tileGradient" x1="105" y1="118" x2="900" y2="900" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0B7A75"/>
+      <stop offset="0.58" stop-color="#0D2B55"/>
+      <stop offset="1" stop-color="#2E7DD4"/>
+    </linearGradient>
+    <radialGradient id="tileHighlight" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(332 250) rotate(45) scale(410)">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.36"/>
+      <stop offset="0.55" stop-color="#FFFFFF" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="220" fill="#0D2B55"/>
+  <rect x="116" y="116" width="792" height="792" rx="178" fill="url(#tileGradient)" stroke="#CCF0EE" stroke-opacity="0.42" stroke-width="14"/>
+  <rect x="116" y="116" width="792" height="792" rx="178" fill="url(#tileHighlight)"/>
+  <circle cx="360" cy="370" r="68" fill="#CCF0EE" stroke="#FFFFFF" stroke-opacity="0.9" stroke-width="18"/>
+  <circle cx="690" cy="674" r="68" fill="#CCF0EE" stroke="#FFFFFF" stroke-opacity="0.9" stroke-width="18"/>
+  <path d="M360 370 C500 230 652 268 712 420" fill="none" stroke="#FFFFFF" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M318 566 H438 L498 338 L594 756 L676 474 L740 566 H838" fill="none" stroke="#FFFFFF" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
